@@ -38,7 +38,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'SonarQube-Token') { 
+                    withSonarQubeEnv(credentialsId: 'SonarQube-token') { 
                         sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.41.144:9000"
                     }
                 }    
@@ -48,7 +48,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-token'
                 }    
             }
         }
