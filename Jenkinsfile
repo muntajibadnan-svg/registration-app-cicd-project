@@ -2,12 +2,15 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "Automated-CICD-App"
-        RELEASE = "1.0.0"
-        DOCKER_USER = "mohammed314"
-        DOCKER_CRED_ID = 'docker-hub'
-        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        APP_NAME           = "Automated-CICD-App"
+        RELEASE            = "1.0.0"
+        DOCKER_USER        = "mohammed314"
+        DOCKER_CRED_ID     = "docker-hub"
+        IMAGE_NAME         = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG          = "${RELEASE}-${BUILD_NUMBER}"
+        SONAR_HOST_URL     = "http://172.31.41.144:9000"
+        JFROG_URL          = "http://3.110.107.83:8082/artifactory"
+        NOTIFICATION_EMAIL = "ashfaque.s510@gmail.com, muntajibadnan@gmail.com"
     }
 
     stages {
@@ -39,7 +42,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube-server') { 
-                        sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.41.144:9000"
+                        sh "mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST_URL}"
                     }
                 }    
             }
@@ -53,11 +56,11 @@ pipeline {
             }
         }
 
-        stage('Artifactory Configuration') {
+        stage("Artifactory Configuration") {
             steps {
                 rtServer (
                     id: "jfrog-server",
-                    url: "http://3.110.107.83:8082/artifactory",
+                    url: "${JFROG_URL}",
                     credentialsId: "jfrog"
                 )
 
@@ -77,19 +80,19 @@ pipeline {
             }
         }
 
-        stage('Deploy Artifacts') {
+        stage("Deploy Artifacts") {
             steps {
                 rtMavenRun (
                     tool: "Maven",
-                    pom: 'pom.xml',
-                    goals: 'clean install',
+                    pom: "pom.xml",
+                    goals: "clean install",
                     deployerId: "MAVEN_DEPLOYER",
                     resolverId: "MAVEN_RESOLVER"
                 )
             }
         }
 
-        stage('Publish Build Info') {
+        stage("Publish Build Info") {
             steps {
                 rtPublishBuildInfo (
                     serverId: "jfrog-server"
@@ -117,7 +120,7 @@ pipeline {
             }
         }
 
-        stage('Cleanup Artifacts') {
+        stage("Cleanup Artifacts") {
             steps {
                 script {
                     sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
@@ -142,7 +145,7 @@ pipeline {
                 </html>''', 
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful ✅", 
                 mimeType: 'text/html',
-                to: "ashfaque.s510@gmail.com, muntajibadnan@gmail.com"
+                to: "${NOTIFICATION_EMAIL}"
             )
         }
         failure {
@@ -150,7 +153,7 @@ pipeline {
                 body: '''${SCRIPT, template="groovy-html.template"}''', 
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed ❌", 
                 mimeType: 'text/html',
-                to: "muntajibadnan@gmail.com"
+                to: "${NOTIFICATION_EMAIL}"
             )
         }
     }
