@@ -149,8 +149,8 @@ pipeline {
                         mimeType: 'text/html',
                         to: "${NOTIFICATION_EMAIL}"
                     )
-                } catch (Exception e) {
-                    echo "Email notification failed (SMTP not configured or error): ${e.message}"
+                } catch (Throwable e) {
+                    echo "Email notification skipped (SMTP not configured or error): ${e.message}"
                 }
             }
         }
@@ -163,8 +163,8 @@ pipeline {
                         mimeType: 'text/html',
                         to: "${NOTIFICATION_EMAIL}"
                     )
-                } catch (Exception e) {
-                    echo "Email notification failed (SMTP not configured or error): ${e.message}"
+                } catch (Throwable e) {
+                    echo "Email notification skipped (SMTP not configured or error): ${e.message}"
                 }
             }
         }
