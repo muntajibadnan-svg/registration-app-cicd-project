@@ -6,9 +6,9 @@ pipeline {
     }
 
     environment {
-        APP_NAME = "register-app-pipeline"
+        APP_NAME = "Automated-CICD-App"
         RELEASE = "1.0.0"
-        DOCKER_USER = "faizan715"
+        DOCKER_USER = "mohammed314"
         DOCKER_CRED_ID = 'docker-hub'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
@@ -23,7 +23,7 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                git branch: 'main', credentialsId: 'github-token-auth', url: 'https://github.com/faizan715/Automated-CICD-App'
+                git branch: 'main', credentialsId: 'muntajib-git-token', url: 'https://github.com/muntajibadnan-svg/registration-app-cicd-project'
             }
         }
 
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'SonarQube-token') { 
-                        sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.22.57:9000"
+                        sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.41.144:9000"
                     }
                 }    
             }
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 rtServer (
                     id: "jfrog-server",
-                    url: "http://13.207.163.246:8082/artifactory",
+                    url: "http://172.31.15.134:8082/artifactory",
                     credentialsId: "jfrog"
                 )
 
@@ -146,7 +146,7 @@ pipeline {
                 </html>''', 
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful ✅", 
                 mimeType: 'text/html',
-                to: "ashfaque.s510@gmail.com, mohammedfaizan2261@gmail.com"
+                to: "ashfaque.s510@gmail.com, muntajibadnan@gmail.com"
             )
         }
         failure {
@@ -154,7 +154,7 @@ pipeline {
                 body: '''${SCRIPT, template="groovy-html.template"}''', 
                 subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed ❌", 
                 mimeType: 'text/html',
-                to: "mohammedfaizan2261@gmail.com"
+                to: "muntajibadnan@gmail.com"
             )
         }
     }
