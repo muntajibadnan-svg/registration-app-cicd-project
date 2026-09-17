@@ -42,7 +42,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'SonarQube-token') { 
+                    withSonarQubeEnv(credentialsId: 'SonarQube-Token') { 
                         sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.41.144:9000"
                     }
                 }    
@@ -52,7 +52,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-token'
+                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-Token'
                 }    
             }
         }
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 rtServer (
                     id: "jfrog-server",
-                    url: "http://172.31.15.134:8082/artifactory",
+                    url: "http://3.110.107.83:8082/artifactory",
                     credentialsId: "jfrog"
                 )
 
