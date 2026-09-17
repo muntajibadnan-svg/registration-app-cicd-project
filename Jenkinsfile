@@ -22,7 +22,7 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                git branch: 'main', credentialsId: 'muntajib-git-token', url: 'https://github.com/muntajibadnan-svg/registration-app-cicd-project'
+                git branch: 'main', url: 'https://github.com/muntajibadnan-svg/registration-app-cicd-project'
             }
         }
 
@@ -132,29 +132,41 @@ pipeline {
 
     post {
         success {
-            emailext (
-                body: '''<html>
-                    <body>
-                        <h2>Build Successful! ✅</h2>
-                        <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-                        <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
-                        <p><strong>Build Status:</strong> SUCCESS</p>
-                        <p>Artifacts have been successfully deployed to JFrog Artifactory.</p>
-                        <p><strong>Build URL:</strong> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                    </body>
-                </html>''', 
-                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful ✅", 
-                mimeType: 'text/html',
-                to: "${NOTIFICATION_EMAIL}"
-            )
+            script {
+                try {
+                    emailext (
+                        body: '''<html>
+                            <body>
+                                <h2>Build Successful! ✅</h2>
+                                <p><strong>Job:</strong> ${env.JOB_NAME}</p>
+                                <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
+                                <p><strong>Build Status:</strong> SUCCESS</p>
+                                <p>Artifacts have been successfully deployed to JFrog Artifactory.</p>
+                                <p><strong>Build URL:</strong> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                            </body>
+                        </html>''', 
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful ✅", 
+                        mimeType: 'text/html',
+                        to: "${NOTIFICATION_EMAIL}"
+                    )
+                } catch (Exception e) {
+                    echo "Email notification failed (SMTP not configured or error): ${e.message}"
+                }
+            }
         }
         failure {
-            emailext (
-                body: '''${SCRIPT, template="groovy-html.template"}''', 
-                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed ❌", 
-                mimeType: 'text/html',
-                to: "${NOTIFICATION_EMAIL}"
-            )
+            script {
+                try {
+                    emailext (
+                        body: '''${SCRIPT, template="groovy-html.template"}''', 
+                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed ❌", 
+                        mimeType: 'text/html',
+                        to: "${NOTIFICATION_EMAIL}"
+                    )
+                } catch (Exception e) {
+                    echo "Email notification failed (SMTP not configured or error): ${e.message}"
+                }
+            }
         }
     }
 }
