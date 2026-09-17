@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-    }
-
     environment {
         APP_NAME = "Automated-CICD-App"
         RELEASE = "1.0.0"
