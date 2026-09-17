@@ -38,7 +38,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'SonarQube-token') { 
+                    withSonarQubeEnv('SonarQube-server') { 
                         sh "mvn sonar:sonar -Dsonar.host.url=http://172.31.41.144:9000"
                     }
                 }    
@@ -48,7 +48,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarQube-token'
+                    waitForQualityGate abortPipeline: false
                 }    
             }
         }
@@ -80,7 +80,7 @@ pipeline {
         stage('Deploy Artifacts') {
             steps {
                 rtMavenRun (
-                    tool: "Maven",
+                    tool: "",
                     pom: 'webapp/pom.xml',
                     goals: 'clean install',
                     deployerId: "MAVEN_DEPLOYER",
