@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME           = "Automated-CICD-App"
+        APP_NAME           = "automated-cicd-app"
         RELEASE            = "1.0.0"
         DOCKER_USER        = "mohammed314"
         DOCKER_CRED_ID     = "docker-hub"
