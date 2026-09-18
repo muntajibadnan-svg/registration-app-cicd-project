@@ -8,9 +8,9 @@ pipeline {
         DOCKER_CRED_ID     = "docker-hub"
         IMAGE_NAME         = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG          = "${RELEASE}-${BUILD_NUMBER}"
-        SONAR_HOST_URL     = "http://172.31.41.144:9000"
-        JFROG_URL          = "http://3.110.107.83:8082/artifactory"
-        NOTIFICATION_EMAIL = "ashfaque.s510@gmail.com, muntajibadnan@gmail.com"
+        SONAR_HOST_URL     = "http://35.154.158.200:9000"
+        JFROG_URL          = "http://43.204.111.118:8082/artifactory"
+        NOTIFICATION_EMAIL = "muntajibadnan@gmail.com"
     }
 
     stages {
