@@ -128,45 +128,38 @@ pipeline {
                 }
             }
         }
-    }
-
-    post {
-        success {
-            script {
-                try {
-                    emailext (
-                        body: '''<html>
-                            <body>
-                                <h2>Build Successful! ✅</h2>
-                                <p><strong>Job:</strong> ${env.JOB_NAME}</p>
-                                <p><strong>Build Number:</strong> ${env.BUILD_NUMBER}</p>
-                                <p><strong>Build Status:</strong> SUCCESS</p>
-                                <p>Artifacts have been successfully deployed to JFrog Artifactory.</p>
-                                <p><strong>Build URL:</strong> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                            </body>
-                        </html>''', 
-                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful ✅", 
-                        mimeType: 'text/html',
-                        to: "${NOTIFICATION_EMAIL}"
-                    )
-                } catch (Throwable e) {
-                    echo "Email notification skipped (SMTP not configured or error): ${e.message}"
+        
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    dir('kubernetes') {
+                        kubeconfig(credentialsId: 'kubernetes', serverUrl: '') {
+                            sh 'kubectl apply -f deployment.yml'
+                            sh 'kubectl apply -f service.yml'
+                            sh 'kubectl rollout restart deployment.apps/registerapp-deployment'
+                        }
+                    }
                 }
             }
         }
+    }
+
+    post {
         failure {
-            script {
-                try {
-                    emailext (
-                        body: '''${SCRIPT, template="groovy-html.template"}''', 
-                        subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed ❌", 
-                        mimeType: 'text/html',
-                        to: "${NOTIFICATION_EMAIL}"
-                    )
-                } catch (Throwable e) {
-                    echo "Email notification skipped (SMTP not configured or error): ${e.message}"
-                }
-            }
+            emailext (
+                body: '''${SCRIPT, template="groovy-html.template"}''', 
+                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
+                mimeType: 'text/html',
+                to: "${NOTIFICATION_EMAIL}"
+            )
+        }
+        success {
+            emailext (
+                body: '''${SCRIPT, template="groovy-html.template"}''', 
+                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
+                mimeType: 'text/html',
+                to: "${NOTIFICATION_EMAIL}"
+            )
         }
     }
 }
