@@ -136,7 +136,7 @@ pipeline {
                         kubeconfig(credentialsId: 'kubernetes', serverUrl: '') {
                             sh 'kubectl apply -f regapp-deploy.yml'
                             sh 'kubectl apply -f regapp-service.yml'
-                            sh 'kubectl rollout restart deployment.apps/regapp-deploy'
+                            sh 'kubectl rollout restart deployment.apps/regapp-deployment'
                         }
                     }
                 }
