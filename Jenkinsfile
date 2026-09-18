@@ -132,7 +132,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    dir('kubernetes') {
+                    dir('Kubernete') {
                         kubeconfig(credentialsId: 'kubernetes', serverUrl: '') {
                             sh 'kubectl apply -f regapp-deploy.yml'
                             sh 'kubectl apply -f regapp-service.yml'
